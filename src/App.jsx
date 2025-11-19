@@ -39,22 +39,39 @@ function App() {
     })
   }
 
-  const onCheckout = async (totals) => {
+  const onCheckout = async ({ total, card_last4 }) => {
     if (cart.length === 0) return
-    const payload = {
-      customer_name: 'Guest',
-      customer_email: 'guest@example.com',
-      customer_address: 'N/A',
-      items: cart.map(c => ({ product_id: c.id, title: c.title, price: c.price, quantity: c.quantity, image: c.image })),
-    }
-    const res = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-    if (res.ok) {
-      const data = await res.json()
-      alert(`Order placed! Total: $${data.total.toFixed(2)}`)
-      setCart([])
-      setCartOpen(false)
-    } else {
-      alert('Failed to place order')
+    try {
+      // 1) Charge payment (mock)
+      const payRes = await fetch(`${API_BASE}/api/payments/charge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total, currency: 'usd', card_last4 })
+      })
+      if (!payRes.ok) {
+        const err = await payRes.json().catch(() => ({}))
+        alert(err.detail || 'Payment failed')
+        return
+      }
+
+      // 2) Create order
+      const payload = {
+        customer_name: 'Guest',
+        customer_email: 'guest@example.com',
+        customer_address: 'N/A',
+        items: cart.map(c => ({ product_id: c.id, title: c.title, price: c.price, quantity: c.quantity, image: c.image })),
+      }
+      const res = await fetch(`${API_BASE}/api/orders`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+      if (res.ok) {
+        const data = await res.json()
+        alert(`Payment successful. Order placed! Total: $${data.total.toFixed(2)}`)
+        setCart([])
+        setCartOpen(false)
+      } else {
+        alert('Order failed after payment—please contact support')
+      }
+    } catch (e) {
+      alert('Checkout failed. Please try again.')
     }
   }
 

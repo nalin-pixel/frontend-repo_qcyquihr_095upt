@@ -1,14 +1,22 @@
+import { useState } from 'react'
+
 function CartDrawer({ open, onClose, items, onCheckout }) {
   const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0)
   const tax = +(subtotal * 0.07).toFixed(2)
   const total = +(subtotal + tax).toFixed(2)
+  const [card, setCard] = useState('')
+
+  const handlePay = () => {
+    const card_last4 = card.replace(/\s+/g, '').slice(-4)
+    onCheckout({ subtotal, tax, total, card_last4 })
+  }
 
   return (
     <div className={`fixed inset-0 z-40 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}>
       <div className={`absolute inset-0 bg-black/50 transition-opacity ${open ? 'opacity-100' : 'opacity-0'}`} onClick={onClose} />
-      <aside className={`absolute right-0 top-0 h-full w-full sm:w-[420px] bg-slate-900 border-l border-white/10 transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`}>
+      <aside className={`absolute right-0 top-0 h-full w-full sm:w-[440px] bg-slate-900 border-l border-white/10 transform transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`}>
         <div className="p-4 border-b border-white/10 text-white font-semibold">Your cart</div>
-        <div className="p-4 space-y-3 max-h-[70%] overflow-y-auto">
+        <div className="p-4 space-y-3 max-h-[60%] overflow-y-auto">
           {items.length === 0 ? (
             <p className="text-slate-400">Your cart is empty.</p>
           ) : (
@@ -28,7 +36,10 @@ function CartDrawer({ open, onClose, items, onCheckout }) {
           <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
           <div className="flex justify-between"><span>Tax</span><span>${tax.toFixed(2)}</span></div>
           <div className="flex justify-between text-white font-semibold text-base pt-2"><span>Total</span><span>${total.toFixed(2)}</span></div>
-          <button onClick={() => onCheckout({ subtotal, tax, total })} className="mt-3 w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Checkout</button>
+          <div className="pt-3 space-y-2">
+            <input value={card} onChange={e=>setCard(e.target.value)} placeholder="Card number (mock)" className="w-full bg-slate-800 border border-white/10 rounded px-3 py-2 text-white placeholder:text-slate-500" />
+            <button onClick={handlePay} className="mt-1 w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Pay ${total.toFixed(2)}</button>
+          </div>
         </div>
       </aside>
     </div>

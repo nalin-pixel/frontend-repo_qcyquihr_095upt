@@ -1,4 +1,4 @@
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, LogIn, Home } from "lucide-react";
 
 function Navbar({ onCartClick, cartCount }) {
   return (
@@ -8,15 +8,19 @@ function Navbar({ onCartClick, cartCount }) {
           <img src="/flame-icon.svg" alt="Logo" className="w-8 h-8" />
           <span className="text-white font-semibold text-lg">Flames Shop</span>
         </a>
-        <button onClick={onCartClick} className="relative inline-flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition">
-          <ShoppingCart size={18} />
-          <span>Cart</span>
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {cartCount}
-            </span>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <a href="/" className="text-slate-300 hover:text-white inline-flex items-center gap-1"><Home size={16}/> Home</a>
+          <a href="/login" className="text-slate-300 hover:text-white inline-flex items-center gap-1"><LogIn size={16}/> Login</a>
+          <button onClick={onCartClick} className="relative inline-flex items-center gap-2 text-white bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition">
+            <ShoppingCart size={18} />
+            <span>Cart</span>
+            {cartCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );
